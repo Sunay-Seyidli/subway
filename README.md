@@ -31,17 +31,42 @@ Senin E1-1200 islemcin bu isleme hic karismiyor.
 
 ---
 
-## ADIM 4: GitHub Secrets Ekle (2 dk)
+## ADIM 4: Unity Lisansi Ekle (ONEMLI!)
 
+GitHub Actions Unity derlemek icin lisans gerekiyor.
+
+### 4a. Unity ID Olustur
+1. https://id.unity.com/ adresine git
+2. Ucretsiz hesap olustur (Personal plan)
+
+### 4b. GitHub Secrets Ekle
 1. Repo sayfasinda "Settings" > "Secrets and variables" > "Actions"
 2. "New repository secret" de ve sirayla ekle:
 
-| Secret Name | Deger |
-|-------------|-------|
-| `UNITY_EMAIL` | Herhangi bir e-posta adresi (ornek@gmail.com) |
-| `UNITY_PASSWORD` | Herhangi bir sifre (12345678) |
+| Secret Name | Nasil Alirsin |
+|-------------|---------------|
+| `UNITY_EMAIL` | Unity ID e-postan |
+| `UNITY_PASSWORD` | Unity ID sifren |
+| `UNITY_LICENSE` | Asagidaki adimlari takip et |
 
-**NOT:** Bu gercek Unity hesabi DEGIL. GitHub Actions'in calismasi icin bos yer tutucu gerekiyor. Unity Personal lisans ucretsiz ve otomatik aktive olur.
+### 4c. Lisans Kodunu Alma (Terminalde)
+
+Lubuntu'da terminal ac ve calistir:
+
+```bash
+# Unity Editor Docker image indir ve lisans al
+docker run --rm   -e "UNITY_EMAIL=epostan@ornek.com"   -e "UNITY_PASSWORD=sifren"   -v "$(pwd):/project"   unityci/editor:ubuntu-2022.3.20f1-webgl-3   /opt/Unity/Editor/Unity   -batchmode -nographics -quit   -logFile /dev/stdout   -username "epostan@ornek.com"   -password "sifren"   -serial ""   -returnlicense
+```
+
+Bu komut calistiktan sonra, bulundugun klasorde bir lisans dosyasi olusur.
+Icerigini kopyala ve GitHub'da `UNITY_LICENSE` secret olarak ekle.
+
+**VEYA** daha kolay yol:
+- Windows'ta bir arkadasinin PC'sinde Unity Hub ac
+- "Manage licenses" > "Activate with license" > Personal sec
+- Cikis yap, lisans dosyasi olusur
+- Dosyayi ac, icerigini kopyala
+- GitHub'a `UNITY_LICENSE` secret olarak yapistir
 
 ---
 
@@ -67,6 +92,10 @@ Build bittiginde:
 
 ## SORUN GIDERME
 
+### "License activation failed" hatasi
+- UNITY_LICENSE secret'i eksik veya yanlis
+- Adim 4c'yi tekrarla, dogru lisans kodunu al
+
 ### Build 1 saatten uzun suruyor
 - Ilk build 15-20 dk surer, sonrakiler 5-10 dk
 - GitHub Actions ucretsiz plan: ayda 2000 dk limit
@@ -91,7 +120,8 @@ Build bittiginde:
 - [ ] GitHub hesabi olusturuldu
 - [ ] Repo olusturuldu (`subway-surfers-webgl`)
 - [ ] Dosyalar yuklendi
-- [ ] GitHub Secrets eklendi (UNITY_EMAIL, UNITY_PASSWORD - herhangi deger)
+- [ ] Unity ID olusturuldu (https://id.unity.com/)
+- [ ] GitHub Secrets eklendi (UNITY_EMAIL, UNITY_PASSWORD, UNITY_LICENSE)
 - [ ] Actions > Build Unity WebGL > Run workflow
 - [ ] Build basarili (yesil tik)
 - [ ] Artifact indirildi
