@@ -12,6 +12,9 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        lfs: true
 
     - name: Cache Unity Library
       uses: actions/cache@v4
@@ -21,12 +24,20 @@ jobs:
         restore-keys: |
           Library-
 
+    - name: Activate Unity License
+      uses: buildalon/activate-unity-license@v2
+      with:
+        license: 'Personal'
+        username: ${{ secrets.UNITY_EMAIL }}
+        password: ${{ secrets.UNITY_PASSWORD }}
+
     - name: Build Unity WebGL
       uses: game-ci/unity-builder@v4
       env:
-        UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+        UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
       with:
-        unityVersion: 2022.3.50f1  # DESTEKLENEN VERSİYON
+        unityVersion: auto
         targetPlatform: WebGL
         buildName: WebGL
         allowDirtyBuild: true
@@ -36,3 +47,10 @@ jobs:
       with:
         name: WebGL-Build
         path: build/WebGL
+
+    - name: Deploy to GitHub Pages
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: build/WebGL
