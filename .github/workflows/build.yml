@@ -21,17 +21,18 @@ jobs:
         restore-keys: |
           Library-
 
-    - name: Build Unity WebGL (Personal License)
+    - name: Build Unity WebGL
       uses: game-ci/unity-builder@v4
       env:
+        UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
         UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
       with:
         targetPlatform: WebGL
         buildName: WebGL
         buildMethod: BuildScript.PerformWebGLBuildBatch
-        # Personal license - no serial needed
-        # Unity will auto-activate with email/password
+        # Free license - no serial needed for Personal
+        allowDirtyBuild: true
 
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v4
